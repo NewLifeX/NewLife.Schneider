@@ -1,14 +1,20 @@
 ﻿using NewLife.IoT.Drivers;
+using NewLife.IoT.Protocols;
 using NewLife.IoT.ThingModels;
 using NewLife.Schneider.Drivers;
 
-Console.WriteLine("服务端地址默认为：127.0.0.1:6000，保持默认请回车开始连接，否则请输入服务端地址：");
+Console.WriteLine("服务端地址默认为：127.0.0.1:502，保持默认请回车开始连接，否则请输入服务端地址：");
 var address = Console.ReadLine();
 
-if (address == null || address == "") address = "127.0.0.1:6000";
+if (address == null || address == "") address = "127.0.0.1:502";
 
 var driver = new SchneiderDriver();
-var pm = new SchneiderParameter { Address = address };
+var pm = new SchneiderParameter {
+    Host = 1, 
+    Server = address,
+    ReadCode = FunctionCodes.ReadRegister,
+    WriteCode = FunctionCodes.WriteRegister
+};
 var node = driver.Open(null, pm);
 
 // 测试打开两个通道
@@ -27,7 +33,7 @@ do
     var point = new Point
     {
         Name = "test",
-        Address = "D100:50",
+        Address = "100",
         Type = "Int32",
         Length = data.Length
     };
