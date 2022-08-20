@@ -1,12 +1,7 @@
 ﻿using System.ComponentModel;
-using HslCommunication.Core;
-using HslCommunication.ModBus;
 using NewLife.IoT;
 using NewLife.IoT.Drivers;
-using NewLife.IoT.Protocols;
-using NewLife.IoT.ThingModels;
 using NewLife.Log;
-using NewLife.Serialization;
 
 namespace NewLife.Schneider.Drivers;
 
