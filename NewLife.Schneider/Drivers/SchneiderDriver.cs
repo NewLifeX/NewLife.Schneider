@@ -1,12 +1,7 @@
 ﻿using System.ComponentModel;
-using HslCommunication.Core;
-using HslCommunication.ModBus;
 using NewLife.IoT;
 using NewLife.IoT.Drivers;
-using NewLife.IoT.Protocols;
-using NewLife.IoT.ThingModels;
 using NewLife.Log;
-using NewLife.Serialization;
 
 namespace NewLife.Schneider.Drivers;
 
@@ -17,12 +12,16 @@ namespace NewLife.Schneider.Drivers;
 [DisplayName("施耐德PLC")]
 public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
 {
+    /// <summary>建立连接，打开驱动</summary>
+    /// <param name="device"></param>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
     public override INode Open(IDevice device, IDictionary<String, Object> parameters)
     {
         var modbusNode = base.Open(device, parameters);
-        if (modbusNode is ModbusNode node && node.Modbus != null)
+        if (modbusNode is ModbusNode node && Modbus != null)
         {
-            node.Modbus.Open();
+            Modbus.Open();
         }
 
         return modbusNode;
