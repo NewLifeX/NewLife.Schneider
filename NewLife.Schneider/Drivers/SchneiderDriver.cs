@@ -16,7 +16,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     /// <param name="device"></param>
     /// <param name="parameters"></param>
     /// <returns></returns>
-    public override INode Open(IDevice device, IDictionary<String, Object> parameters)
+    public override INode Open(IDevice device, IDriverParameter parameters)
     {
         var modbusNode = base.Open(device, parameters);
         if (modbusNode is ModbusNode node && Modbus != null)
