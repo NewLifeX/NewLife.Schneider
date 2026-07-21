@@ -11,4 +11,8 @@
     <ProjectReference Include="..\NewLife.Schneider\NewLife.Schneider.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NewLife.Modbus" Version="2.0.2026.610" />
+  </ItemGroup>
+
 </Project>

@@ -19,4 +19,7 @@ public class SchneiderNode : INode
 
     /// <summary>参数</summary>
     public IDriverParameter Parameter { get; set; }
+
+    /// <summary>是否已连接。驱动维护的连接状态，无需触发一次采集才能感知连接健康</summary>
+    public Boolean IsConnected { get; set; }
 }
