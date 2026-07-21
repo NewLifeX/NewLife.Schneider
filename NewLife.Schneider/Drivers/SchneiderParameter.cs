@@ -3,7 +3,7 @@ using NewLife.IoT.Drivers;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>Melsec参数</summary>
+/// <summary>施耐德PLC参数</summary>
 public class SchneiderParameter : ModbusTcpParameter
 {
 }
