@@ -3,6 +3,7 @@ using NewLife.IoT;
 using NewLife.IoT.Drivers;
 using NewLife.IoT.ThingModels;
 using NewLife.Log;
+using NewLife.Threading;
 
 namespace NewLife.Schneider.Drivers;
 
@@ -27,9 +28,116 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         if (modbusNode is ModbusNode node && Modbus != null)
         {
             Modbus.Open();
+
+            // 启动健康检测
+            StartHealthCheck(node);
         }
 
         return modbusNode;
+    }
+    #endregion
+
+    #region 健康检测
+    /// <summary>健康检测定时器</summary>
+    private TimerX _healthTimer;
+
+    /// <summary>健康检测间隔。默认 30 秒，设为 0 或负值关闭检测</summary>
+    public Int32 HealthCheckInterval { get; set; } = 30;
+
+    /// <summary>当前连接的节点</summary>
+    private ModbusNode _currentNode;
+
+    /// <summary>连接状态变更事件。参数：是否已连接</summary>
+    public event Action<Boolean> ConnectionStatusChanged;
+
+    /// <summary>当前是否已连接</summary>
+    private Boolean _connected;
+
+    /// <summary>启动健康检测</summary>
+    /// <param name="node">当前节点</param>
+    private void StartHealthCheck(ModbusNode node)
+    {
+        _currentNode = node;
+        _connected = true;
+
+        if (HealthCheckInterval <= 0) return;
+
+        // 使用 TimerX 进行周期性检测
+        _healthTimer = new TimerX(DoHealthCheck, null, HealthCheckInterval * 1000, HealthCheckInterval * 1000)
+        {
+            Async = true,
+        };
+    }
+
+    /// <summary>执行健康检测</summary>
+    /// <param name="state">定时器状态参数（未使用）</param>
+    private void DoHealthCheck(Object state)
+    {
+        try
+        {
+            if (_currentNode == null || Modbus == null) return;
+
+            var oldConnected = _connected;
+            var newConnected = false;
+
+            try
+            {
+                // 通过尝试打开连接来检测连通性（已打开则无操作）
+                Modbus.Open();
+                newConnected = true;
+            }
+            catch
+            {
+                newConnected = false;
+            }
+
+            if (oldConnected != newConnected)
+            {
+                _connected = newConnected;
+
+                // 触发连接状态变更事件
+                ConnectionStatusChanged?.Invoke(newConnected);
+
+                WriteLog("连接状态变更: {0} → {1}", oldConnected ? "已连接" : "已断开", newConnected ? "已连接" : "已断开");
+
+                // 断线自动重连
+                if (!newConnected)
+                {
+                    TryReconnect();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            WriteLog("健康检测异常: {0}", ex.Message);
+        }
+    }
+
+    /// <summary>尝试重连</summary>
+    private void TryReconnect()
+    {
+        try
+        {
+            WriteLog("尝试重连...");
+
+            Modbus.Open();
+
+            _connected = true;
+            ConnectionStatusChanged?.Invoke(true);
+            WriteLog("重连成功");
+        }
+        catch (Exception ex)
+        {
+            WriteLog("重连失败: {0}", ex.Message);
+        }
+    }
+
+    /// <summary>停止健康检测</summary>
+    private void StopHealthCheck()
+    {
+        _healthTimer?.Dispose();
+        _healthTimer = null;
+        _currentNode = null;
     }
     #endregion
 
