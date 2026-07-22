@@ -96,6 +96,7 @@ Console.WriteLine($"{info.Name}: {info.MaxRegisters} 寄存器");
 | [功能清单](Doc/功能清单.md) | 功能实现/测试/注释三维状态追踪 |
 | [架构设计](Doc/架构设计.md) | 分层、组件、流程与关键决策 |
 | [竞品分析](Doc/竞品分析报告.md) | 竞品对比矩阵与差距分析 |
+| [Modbus Plus 桥接说明](Doc/Modbus%20Plus%20桥接说明.md) | 通过以太网模块桥接访问 Modbus Plus 设备 |
 
 ## 📦 依赖
 
