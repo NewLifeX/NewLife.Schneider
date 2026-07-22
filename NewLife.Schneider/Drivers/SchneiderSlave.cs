@@ -6,7 +6,7 @@ using NewLife.Log;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>施耐德PLC从机/服务器模式</summary>
+/// <summary>施耐德PLC从机/服务器模式 / Schneider PLC slave/server mode</summary>
 /// <remarks>
 /// 基于 ModbusSlave 基类实现施耐德 PLC 从机模式，允许其他 Modbus 主站
 /// 通过标准 Modbus TCP 协议读写本驱动的寄存器/线圈数据。
@@ -40,12 +40,12 @@ namespace NewLife.Schneider.Drivers;
 public class SchneiderSlave : ModbusSlave
 {
     #region 属性
-    /// <summary>监听端口。默认 502</summary>
+    /// <summary>监听端口。默认 502 / Listening port. Default 502</summary>
     public new Int32 Port { get; set; } = 502;
     #endregion
 
     #region 构造
-    /// <summary>实例化施耐德PLC从机</summary>
+    /// <summary>实例化施耐德PLC从机 / Instantiate Schneider PLC slave</summary>
     public SchneiderSlave()
     {
         DeviceInfo = new ModbusDeviceInfo
@@ -58,15 +58,15 @@ public class SchneiderSlave : ModbusSlave
     #endregion
 
     #region 启动停止
-    /// <summary>启动从机服务</summary>
+    /// <summary>启动从机服务 / Start slave service</summary>
     public new void Start()
     {
         OnStart();
         WriteLog("施耐德PLC从机已启动，监听端口 {0}", Port);
     }
 
-    /// <summary>停止从机服务。释放网络监听资源，断开所有客户端连接</summary>
-    /// <remarks>调用后从机不再响应任何 Modbus TCP 请求。可通过 <see cref="Start"/> 重新启动。</remarks>
+    /// <summary>停止从机服务。释放网络监听资源，断开所有客户端连接 / Stop slave service. Release network listening resources, disconnect all clients</summary>
+    /// <remarks>调用后从机不再响应任何 Modbus TCP 请求。可通过 <see cref="Start"/> 重新启动。 / After calling, slave no longer responds to Modbus TCP requests. Can be restarted via <see cref="Start"/>.</remarks>
     public void Stop()
     {
         WriteLog("施耐德PLC从机已停止");
@@ -74,13 +74,14 @@ public class SchneiderSlave : ModbusSlave
     #endregion
 
     #region 标签式读写
-    /// <summary>通过标签从从机读取数据</summary>
+    /// <summary>通过标签从从机读取数据 / Read data from slave by tag</summary>
     /// <remarks>
     /// 将施耐德标签地址（如 "MW100"、"M0.1"）映射到 Modbus 寄存器/线圈地址，
     /// 然后从本地 Registers/Coils 中查找对应值。
+    /// Maps Schneider tag addresses to Modbus register/coil addresses, then looks up values from local Registers/Coils.
     /// </remarks>
-    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1"</param>
-    /// <returns>读取到的值，类型由地址自动确定</returns>
+    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1" / Schneider tag address</param>
+    /// <returns>读取到的值，类型由地址自动确定 / The read value, type determined automatically by address</returns>
     /// <example>
     /// <code>
     /// var slave = new SchneiderSlave();
@@ -135,13 +136,14 @@ public class SchneiderSlave : ModbusSlave
         }
     }
 
-    /// <summary>通过标签向从机写入数据</summary>
+    /// <summary>通过标签向从机写入数据 / Write data to slave by tag</summary>
     /// <remarks>
     /// 将施耐德标签地址映射到 Modbus 寄存器/线圈地址，将 .NET 类型值
     /// 写入本地 Registers/Coils 中。
+    /// Maps Schneider tag addresses to Modbus register/coil addresses and writes .NET type values to local Registers/Coils.
     /// </remarks>
-    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1"</param>
-    /// <param name="value">要写入的值，支持 Boolean/UInt16/UInt32/Single</param>
+    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1" / Schneider tag address</param>
+    /// <param name="value">要写入的值，支持 Boolean/UInt16/UInt32/Single / Value to write, supports Boolean/UInt16/UInt32/Single</param>
     /// <example>
     /// <code>
     /// var slave = new SchneiderSlave();

@@ -2,65 +2,65 @@ using System.ComponentModel;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>施耐德PLC型号</summary>
+/// <summary>施耐德PLC型号 / Schneider PLC models</summary>
 public enum SchneiderModel
 {
-    /// <summary>M200。基础型PLC，适用于简单控制任务</summary>
+    /// <summary>M200。基础型PLC，适用于简单控制任务 / Basic PLC, suitable for simple control tasks</summary>
     [Description("M200 基础型PLC")]
     M200 = 0,
 
-    /// <summary>M221。高级型PLC，适用于中等规模控制</summary>
+    /// <summary>M221。高级型PLC，适用于中等规模控制 / Advanced PLC, suitable for medium-scale control</summary>
     [Description("M221 高级型PLC")]
     M221 = 1,
 
-    /// <summary>M241。逻辑控制器，适用于复杂逻辑控制</summary>
+    /// <summary>M241。逻辑控制器，适用于复杂逻辑控制 / Logic controller, suitable for complex logic control</summary>
     [Description("M241 逻辑控制器")]
     M241 = 2,
 
-    /// <summary>M251。运动控制器，适用于运动控制场景</summary>
+    /// <summary>M251。运动控制器，适用于运动控制场景 / Motion controller, suitable for motion control scenarios</summary>
     [Description("M251 运动控制器")]
     M251 = 3,
 
-    /// <summary>M258。高级运动控制器，适用于高性能运动控制</summary>
+    /// <summary>M258。高级运动控制器，适用于高性能运动控制 / Advanced motion controller, suitable for high-performance motion control</summary>
     [Description("M258 高级运动控制器")]
     M258 = 4,
 
-    /// <summary>M262。IoT网关PLC，集成物联网边缘网关功能</summary>
+    /// <summary>M262。IoT网关PLC，集成物联网边缘网关功能 / IoT gateway PLC with integrated edge gateway functionality</summary>
     [Description("M262 IoT网关PLC")]
     M262 = 5,
 }
 
-/// <summary>施耐德PLC型号预设信息</summary>
+/// <summary>施耐德PLC型号预设信息 / Schneider PLC model preset information</summary>
 public class SchneiderModelInfo
 {
     #region 属性
-    /// <summary>型号</summary>
+    /// <summary>型号 / Model</summary>
     public SchneiderModel Model { get; }
 
-    /// <summary>型号名称</summary>
+    /// <summary>型号名称 / Model name</summary>
     public String Name { get; }
 
-    /// <summary>默认TCP端口</summary>
+    /// <summary>默认TCP端口 / Default TCP port</summary>
     public Int32 Port { get; }
 
-    /// <summary>默认读取功能码。通常为3(读保持寄存器)</summary>
+    /// <summary>默认读取功能码。通常为3(读保持寄存器) / Default read function code. Usually 3 (Read Holding Registers)</summary>
     public Byte ReadCode { get; }
 
-    /// <summary>默认写入功能码。通常为16(写多寄存器)</summary>
+    /// <summary>默认写入功能码。通常为16(写多寄存器) / Default write function code. Usually 16 (Write Multiple Registers)</summary>
     public Byte WriteCode { get; }
 
-    /// <summary>最大线圈数量</summary>
+    /// <summary>最大线圈数量 / Maximum number of coils</summary>
     public Int32 MaxCoils { get; }
 
-    /// <summary>最大寄存器数量</summary>
+    /// <summary>最大寄存器数量 / Maximum number of registers</summary>
     public Int32 MaxRegisters { get; }
 
-    /// <summary>说明</summary>
+    /// <summary>说明 / Description</summary>
     public String Description { get; }
     #endregion
 
     #region 构造
-    /// <summary>构造型号预设信息</summary>
+    /// <summary>构造型号预设信息 / Construct model preset information</summary>
     public SchneiderModelInfo(SchneiderModel model, String name, Int32 port, Byte readCode, Byte writeCode, Int32 maxCoils, Int32 maxRegisters, String description)
     {
         Model = model;
@@ -75,7 +75,7 @@ public class SchneiderModelInfo
     #endregion
 }
 
-/// <summary>施耐德PLC型号预设帮助类</summary>
+/// <summary>施耐德PLC型号预设帮助类 / Schneider PLC model preset helper</summary>
 /// <example>
 /// <code>
 /// // 获取 M200 型号预设
@@ -93,9 +93,9 @@ public class SchneiderModelInfo
 /// </example>
 public static class SchneiderModelHelper
 {
-    /// <summary>获取型号预设信息</summary>
-    /// <param name="model">施耐德PLC型号</param>
-    /// <returns>型号预设信息</returns>
+    /// <summary>获取型号预设信息 / Get model preset information</summary>
+    /// <param name="model">施耐德PLC型号 / Schneider PLC model</param>
+    /// <returns>型号预设信息 / Model preset information</returns>
     public static SchneiderModelInfo GetModelInfo(SchneiderModel model) => model switch
     {
         SchneiderModel.M200 => new SchneiderModelInfo(
@@ -125,10 +125,10 @@ public static class SchneiderModelHelper
         _ => throw new ArgumentOutOfRangeException(nameof(model), $"不支持的施耐德PLC型号: {model}"),
     };
 
-    /// <summary>根据型号名称获取预设信息</summary>
-    /// <param name="name">型号名称，如"M200"、"M221"</param>
-    /// <returns>型号预设信息</returns>
-    /// <exception cref="ArgumentOutOfRangeException">未识别的型号名称</exception>
+    /// <summary>根据型号名称获取预设信息 / Get model preset information by model name</summary>
+    /// <param name="name">型号名称，如"M200"、"M221" / Model name, e.g. "M200", "M221"</param>
+    /// <returns>型号预设信息 / Model preset information</returns>
+    /// <exception cref="ArgumentOutOfRangeException">未识别的型号名称 / Unrecognized model name</exception>
     public static SchneiderModelInfo GetModelInfo(String name)
     {
         if (String.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
@@ -145,8 +145,8 @@ public static class SchneiderModelHelper
         };
     }
 
-    /// <summary>获取所有支持的型号列表</summary>
-    /// <returns>型号预设信息数组</returns>
+    /// <summary>获取所有支持的型号列表 / Get all supported model list</summary>
+    /// <returns>型号预设信息数组 / Array of model preset information</returns>
     public static SchneiderModelInfo[] GetAllModels() =>
     [
         GetModelInfo(SchneiderModel.M200),

@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net461;net45</TargetFrameworks>
-    <AssemblyTitle>施耐德PLC协议</AssemblyTitle>
-    <Description>施耐德PLC协议</Description>
+    <AssemblyTitle>Schneider PLC Driver / 施耐德PLC协议</AssemblyTitle>
+    <Description>Schneider PLC communication driver based on Modbus TCP. 基于 Modbus TCP 的施耐德 PLC 通信驱动库。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 新生命开发团队</Copyright>
     <VersionPrefix>1.0</VersionPrefix>
@@ -26,8 +26,8 @@
     <PackageIcon>leaf.png</PackageIcon>
     <RepositoryUrl>https://github.com/NewLifeX/NewLife.Schneider</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>物联网;IoT;边缘计算;Edge;新生命团队;NewLife;PLC;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageTags>PLC;Schneider;Modbus;IoT;Industrial;Automation;Driver;新生命;NewLife;NewLife.Schneider</PackageTags>
+    <PackageReleaseNotes>Schneider PLC communication driver based on Modbus TCP protocol, supporting tag-based R/W and automatic type conversion.</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

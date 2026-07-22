@@ -4,12 +4,12 @@ using NewLife.Serialization;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>施耐德PLC参数</summary>
+/// <summary>施耐德PLC参数 / Schneider PLC parameters</summary>
 public class SchneiderParameter : ModbusTcpParameter
 {
     #region 序列化
-    /// <summary>序列化为JSON字符串</summary>
-    /// <returns>JSON字符串</returns>
+    /// <summary>序列化为JSON字符串 / Serialize to JSON string</summary>
+    /// <returns>JSON字符串 / JSON string</returns>
     /// <example>
     /// <code>
     /// var pm = new SchneiderParameter { Host = 1, Server = "192.168.1.100:502" };
@@ -20,10 +20,10 @@ public class SchneiderParameter : ModbusTcpParameter
     /// </example>
     public String ToJson() => JsonHelper.ToJson(this, false, false, true);
 
-    /// <summary>从JSON字符串反序列化</summary>
-    /// <param name="json">JSON字符串</param>
-    /// <returns>反序列化后的参数对象</returns>
-    /// <exception cref="ArgumentNullException">json为null时抛出</exception>
+    /// <summary>从JSON字符串反序列化 / Deserialize from JSON string</summary>
+    /// <param name="json">JSON字符串 / JSON string</param>
+    /// <returns>反序列化后的参数对象 / Deserialized parameter object</returns>
+    /// <exception cref="ArgumentNullException">json为null时抛出 / Thrown when json is null</exception>
     /// <example>
     /// <code>
     /// var json = @"{""Host"":1,""Server"":""192.168.1.100:502""}";

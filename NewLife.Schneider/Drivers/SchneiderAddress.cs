@@ -4,23 +4,23 @@ using System.Text.RegularExpressions;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>施耐德地址类型</summary>
+/// <summary>施耐德地址类型 / Schneider address type</summary>
 public enum SchneiderAddressType
 {
-    /// <summary>线圈。对应Modbus FC01/FC05，如%M、%Q</summary>
+    /// <summary>线圈。对应Modbus FC01/FC05，如%M、%Q / Coil. Maps to Modbus FC01/FC05, e.g. %M, %Q</summary>
     Coil = 0,
 
-    /// <summary>离散输入。对应Modbus FC02，如%I</summary>
+    /// <summary>离散输入。对应Modbus FC02，如%I / Discrete input. Maps to Modbus FC02, e.g. %I</summary>
     DiscreteInput = 1,
 
-    /// <summary>输入寄存器。对应Modbus FC04，如%IW、%SW</summary>
+    /// <summary>输入寄存器。对应Modbus FC04，如%IW、%SW / Input register. Maps to Modbus FC04, e.g. %IW, %SW</summary>
     InputRegister = 2,
 
-    /// <summary>保持寄存器。对应Modbus FC03/FC16，如%MW、%MD、%MF、%QW</summary>
+    /// <summary>保持寄存器。对应Modbus FC03/FC16，如%MW、%MD、%MF、%QW / Holding register. Maps to Modbus FC03/FC16, e.g. %MW, %MD, %MF, %QW</summary>
     HoldingRegister = 3,
 }
 
-/// <summary>施耐德PLC地址解析器</summary>
+/// <summary>施耐德PLC地址解析器 / Schneider PLC address parser</summary>
 /// <remarks>
 /// 将施耐德 PLC 原生寻址语法解析为 Modbus 地址和功能码。
 /// 支持格式：
@@ -55,22 +55,22 @@ public enum SchneiderAddressType
 public class SchneiderAddress
 {
     #region 属性
-    /// <summary>地址类型</summary>
+    /// <summary>地址类型 / Address type</summary>
     public SchneiderAddressType Type { get; }
 
-    /// <summary>Modbus寄存器/线圈偏移地址</summary>
+    /// <summary>Modbus寄存器/线圈偏移地址 / Modbus register/coil offset address</summary>
     public Int32 Offset { get; }
 
-    /// <summary>是否位操作。线圈和离散输入为位操作</summary>
+    /// <summary>是否位操作。线圈和离散输入为位操作 / Whether this is a bit operation. Coils and discrete inputs are bit operations</summary>
     public Boolean IsBit { get; }
 
-    /// <summary>位地址中的位索引(0~7)。仅IsBit=true时有效</summary>
+    /// <summary>位地址中的位索引(0~7)。仅IsBit=true时有效 / Bit index in bit address (0~7). Only valid when IsBit=true</summary>
     public Int32 BitIndex { get; }
 
-    /// <summary>数据类型长度。1=位/字, 2=双字/浮点</summary>
+    /// <summary>数据类型长度。1=位/字, 2=双字/浮点 / Data type length. 1=bit/word, 2=double word/float</summary>
     public Int32 Length { get; }
 
-    /// <summary>原始标签字符串</summary>
+    /// <summary>原始标签字符串 / Raw tag string</summary>
     public String Raw { get; }
     #endregion
 
@@ -87,11 +87,11 @@ public class SchneiderAddress
     #endregion
 
     #region 方法
-    /// <summary>解析施耐德地址标签</summary>
-    /// <param name="tag">施耐德地址标签，如 "MW100"、"M0.1"、"I0.0"、"QW50"</param>
-    /// <returns>解析后的SchneiderAddress对象</returns>
-    /// <exception cref="ArgumentNullException">tag为null时抛出</exception>
-    /// <exception cref="FormatException">地址格式不正确时抛出</exception>
+    /// <summary>解析施耐德地址标签 / Parse Schneider address tag</summary>
+    /// <param name="tag">施耐德地址标签，如 "MW100"、"M0.1"、"I0.0"、"QW50" / Schneider address tag</param>
+    /// <returns>解析后的SchneiderAddress对象 / Parsed SchneiderAddress object</returns>
+    /// <exception cref="ArgumentNullException">tag为null时抛出 / Thrown when tag is null</exception>
+    /// <exception cref="FormatException">地址格式不正确时抛出 / Thrown when address format is invalid</exception>
     /// <example>
     /// <code>
     /// var addr = SchneiderAddress.Parse("%MW100");
@@ -136,10 +136,10 @@ public class SchneiderAddress
         };
     }
 
-    /// <summary>尝试解析施耐德地址标签，不抛出异常</summary>
-    /// <param name="tag">施耐德地址标签</param>
-    /// <param name="address">解析成功时返回SchneiderAddress对象</param>
-    /// <returns>是否解析成功</returns>
+    /// <summary>尝试解析施耐德地址标签，不抛出异常 / Try to parse Schneider address tag without throwing exceptions</summary>
+    /// <param name="tag">施耐德地址标签 / Schneider address tag</param>
+    /// <param name="address">解析成功时返回SchneiderAddress对象 / Parsed SchneiderAddress object on success</param>
+    /// <returns>是否解析成功 / Whether parsing succeeded</returns>
     public static Boolean TryParse(String tag, out SchneiderAddress address)
     {
         try
@@ -154,8 +154,8 @@ public class SchneiderAddress
         }
     }
 
-    /// <summary>获取推荐的读功能码</summary>
-    /// <returns>Modbus功能码</returns>
+    /// <summary>获取推荐的读功能码 / Get recommended read function code</summary>
+    /// <returns>Modbus功能码 / Modbus function code</returns>
     public Byte GetReadCode() => Type switch
     {
         SchneiderAddressType.Coil => SchneiderFunctionCodes.ReadCoil,
@@ -165,8 +165,8 @@ public class SchneiderAddress
         _ => SchneiderFunctionCodes.ReadHoldingRegister,
     };
 
-    /// <summary>获取推荐的写功能码</summary>
-    /// <returns>Modbus功能码。只读类型返回0</returns>
+    /// <summary>获取推荐的写功能码 / Get recommended write function code</summary>
+    /// <returns>Modbus功能码。只读类型返回0 / Modbus function code, returns 0 for read-only types</returns>
     public Byte GetWriteCode() => Type switch
     {
         SchneiderAddressType.Coil => IsBit ? SchneiderFunctionCodes.WriteCoil : SchneiderFunctionCodes.WriteMultipleCoils,
@@ -176,15 +176,15 @@ public class SchneiderAddress
         _ => SchneiderFunctionCodes.WriteSingleRegister,
     };
 
-    /// <summary>获取Modbus起始地址</summary>
-    /// <remarks>对于位类型地址（%Mx.y），Modbus 地址为 x*8 + y</remarks>
+    /// <summary>获取Modbus起始地址 / Get Modbus start address</summary>
+    /// <remarks>对于位类型地址（%Mx.y），Modbus 地址为 x*8 + y / For bit-type addresses (%Mx.y), Modbus address is x*8 + y</remarks>
     public Int32 GetModbusAddress() => Type switch
     {
         SchneiderAddressType.Coil or SchneiderAddressType.DiscreteInput => Offset * 8 + BitIndex,
         _ => Offset,
     };
 
-    /// <summary>返回施耐德格式的地址字符串</summary>
+    /// <summary>返回施耐德格式的地址字符串 / Returns the address string in Schneider format</summary>
     public override String ToString() => $"%{Raw}";
     #endregion
 }

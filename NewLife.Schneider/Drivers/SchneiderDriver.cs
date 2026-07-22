@@ -7,21 +7,22 @@ using NewLife.Threading;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>施耐德PLC驱动</summary>
+/// <summary>施耐德PLC驱动 / Schneider PLC driver</summary>
 /// <remarks>
 /// 基于 Modbus TCP 的施耐德 PLC 专用驱动，支持标签式读写和自动类型转换。
 /// 提供 ReadTag/WriteTag 高层接口，内部自动解析施耐德原生寻址语法并映射到 Modbus 功能码。
+/// Schneider PLC-specific driver based on Modbus TCP, supporting tag-based R/W and automatic type conversion.
 /// </remarks>
 [Driver("SchneiderPLC")]
 [DisplayName("施耐德PLC")]
 public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
 {
     #region 构造
-    /// <summary>建立连接，打开驱动</summary>
-    /// <param name="device">逻辑设备</param>
-    /// <param name="parameter">驱动参数</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>节点对象</returns>
+    /// <summary>建立连接，打开驱动 / Open connection and driver</summary>
+    /// <param name="device">逻辑设备 / Logical device</param>
+    /// <param name="parameter">驱动参数 / Driver parameter</param>
+    /// <param name="cancellationToken">取消令牌 / Cancellation token</param>
+    /// <returns>节点对象 / Node object</returns>
     public override async Task<INode> OpenAsync(IDevice device, IDriverParameter parameter, CancellationToken cancellationToken)
     {
         var modbusNode = await base.OpenAsync(device, parameter, cancellationToken);
@@ -38,23 +39,23 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     #endregion
 
     #region 健康检测
-    /// <summary>健康检测定时器</summary>
+    /// <summary>健康检测定时器 / Health check timer</summary>
     private TimerX _healthTimer;
 
-    /// <summary>健康检测间隔。默认 30 秒，设为 0 或负值关闭检测</summary>
+    /// <summary>健康检测间隔。默认 30 秒，设为 0 或负值关闭检测 / Health check interval. Default 30s, set to 0 or negative to disable</summary>
     public Int32 HealthCheckInterval { get; set; } = 30;
 
-    /// <summary>当前连接的节点</summary>
+    /// <summary>当前连接的节点 / Currently connected node</summary>
     private ModbusNode _currentNode;
 
-    /// <summary>连接状态变更事件。参数：是否已连接</summary>
+    /// <summary>连接状态变更事件。参数：是否已连接 / Connection status changed event. Parameter: whether connected</summary>
     public event Action<Boolean> ConnectionStatusChanged;
 
-    /// <summary>当前是否已连接</summary>
+    /// <summary>当前是否已连接 / Whether currently connected</summary>
     private Boolean _connected;
 
-    /// <summary>启动健康检测</summary>
-    /// <param name="node">当前节点</param>
+    /// <summary>启动健康检测 / Start health check</summary>
+    /// <param name="node">当前节点 / Current node</param>
     private void StartHealthCheck(ModbusNode node)
     {
         _currentNode = node;
@@ -69,8 +70,8 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         };
     }
 
-    /// <summary>执行健康检测</summary>
-    /// <param name="state">定时器状态参数（未使用）</param>
+    /// <summary>执行健康检测 / Execute health check</summary>
+    /// <param name="state">定时器状态参数（未使用） / Timer state parameter (unused)</param>
     private void DoHealthCheck(Object state)
     {
         try
@@ -114,7 +115,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         }
     }
 
-    /// <summary>尝试重连</summary>
+    /// <summary>尝试重连 / Try to reconnect</summary>
     private void TryReconnect()
     {
         try
@@ -133,7 +134,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         }
     }
 
-    /// <summary>停止健康检测</summary>
+    /// <summary>停止健康检测 / Stop health check</summary>
     private void StopHealthCheck()
     {
         _healthTimer?.Dispose();
@@ -143,14 +144,15 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     #endregion
 
     #region 型号预设
-    /// <summary>根据施耐德PLC型号创建预设参数</summary>
+    /// <summary>根据施耐德PLC型号创建预设参数 / Create preset parameters by Schneider PLC model</summary>
     /// <remarks>
     /// 根据型号自动填充默认端口、功能码和寄存器限制。支持 M200/M221/M241/M251/M258/M262。
+    /// Automatically fills default port, function codes and register limits based on model.
     /// </remarks>
-    /// <param name="model">施耐德PLC型号</param>
-    /// <param name="host">站号，默认1</param>
-    /// <param name="server">服务端地址，默认 "127.0.0.1:502"</param>
-    /// <returns>预设参数的 SchneiderParameter</returns>
+    /// <param name="model">施耐德PLC型号 / Schneider PLC model</param>
+    /// <param name="host">站号，默认1 / Station number, default 1</param>
+    /// <param name="server">服务端地址，默认 "127.0.0.1:502" / Server address</param>
+    /// <returns>预设参数的 SchneiderParameter / Pre-configured SchneiderParameter</returns>
     /// <example>
     /// <code>
     /// var driver = new SchneiderDriver();
@@ -173,7 +175,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     #endregion
 
     #region 标签式读写
-    /// <summary>读取单个施耐德标签，返回自动转换类型后的值</summary>
+    /// <summary>读取单个施耐德标签，返回自动转换类型后的值 / Read a single Schneider tag, returns auto-converted value</summary>
     /// <remarks>
     /// 支持施耐德原生寻址语法，如 "MW100"、"M0.1"、"I0.0"、"QW50"、"MD200"、"MF100"。
     /// 内部自动解析标签地址并映射到对应的 Modbus 功能码和寄存器地址。
@@ -184,11 +186,12 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     ///   <item><term>%MF</term><description>Single（32 位浮点数）</description></item>
     ///   <item><term>%M、%I、%Q</term><description>Boolean（位状态）</description></item>
     /// </list>
+    /// Supports Schneider native addressing syntax. Automatically resolves tag addresses and maps to Modbus function codes and register addresses.
     /// </remarks>
-    /// <param name="node">节点对象</param>
-    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1"</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>读取到的数据值，类型由地址自动确定</returns>
+    /// <param name="node">节点对象 / Node object</param>
+    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1" / Schneider tag address</param>
+    /// <param name="cancellationToken">取消令牌 / Cancellation token</param>
+    /// <returns>读取到的数据值，类型由地址自动确定 / The data value, type determined automatically by address</returns>
     /// <example>
     /// <code>
     /// var driver = new SchneiderDriver();
@@ -211,12 +214,12 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         return ConvertToTypedValue(value, tag, addr);
     }
 
-    /// <summary>读取单个施耐德标签并返回指定 .NET 类型的值</summary>
-    /// <typeparam name="T">目标 .NET 类型（如 UInt16、UInt32、Single、Boolean）</typeparam>
-    /// <param name="node">节点对象</param>
-    /// <param name="tag">施耐德标签地址</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>转换后的类型化值；转换失败或读取失败时返回 default(T)</returns>
+    /// <summary>读取单个施耐德标签并返回指定 .NET 类型的值 / Read a single Schneider tag and return a strongly-typed value</summary>
+    /// <typeparam name="T">目标 .NET 类型（如 UInt16、UInt32、Single、Boolean） / Target .NET type</typeparam>
+    /// <param name="node">节点对象 / Node object</param>
+    /// <param name="tag">施耐德标签地址 / Schneider tag address</param>
+    /// <param name="cancellationToken">取消令牌 / Cancellation token</param>
+    /// <returns>转换后的类型化值；转换失败或读取失败时返回 default(T) / Typed value, returns default(T) on failure</returns>
     /// <example>
     /// <code>
     /// var driver = new SchneiderDriver();
@@ -241,18 +244,19 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         }
     }
 
-    /// <summary>批量读取多个施耐德标签</summary>
+    /// <summary>批量读取多个施耐德标签 / Batch read multiple Schneider tags</summary>
     /// <remarks>
     /// 内部将每个标签解析为独立 IPoint 后合并一次 Modbus 请求发送，
     /// 减少网络往返次数。适用于需要同时读取多个不连续地址的场景。
     /// 
     /// 若地址相邻，Modbus 协议会合并为连续读取以提高效率；
     /// 若地址分散，内部会拆分为多次请求（由基类 ModbusDriver 的聚合逻辑决定）。
+    /// Parses each tag into an IPoint and sends a combined Modbus request to reduce network round-trips.
     /// </remarks>
-    /// <param name="node">节点对象</param>
-    /// <param name="tags">施耐德标签地址数组，如 ["MW100", "M0.1", "MD200"]</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>标签名到数据值的字典。值已自动转换为对应 .NET 类型</returns>
+    /// <param name="node">节点对象 / Node object</param>
+    /// <param name="tags">施耐德标签地址数组 / Array of Schneider tag addresses</param>
+    /// <param name="cancellationToken">取消令牌 / Cancellation token</param>
+    /// <returns>标签名到数据值的字典。值已自动转换为对应 .NET 类型 / Dictionary of tag names to data values, auto-converted to .NET types</returns>
     public async Task<IDictionary<String, Object>> ReadTags(INode node, String[] tags, CancellationToken cancellationToken = default)
     {
         var pointList = new List<(String tag, SchneiderAddress addr, IPoint point)>();
@@ -278,16 +282,17 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         return dic;
     }
 
-    /// <summary>写入单个施耐德标签</summary>
+    /// <summary>写入单个施耐德标签 / Write a single Schneider tag</summary>
     /// <remarks>
     /// 支持施耐德原生寻址语法，内部自动解析标签地址并映射到对应的 Modbus 功能码和寄存器地址。
     /// value 参数支持 .NET 原生类型（Boolean、UInt16、UInt32、Single 等），驱动自动转换为 Modbus 协议格式。
+    /// Supports Schneider native addressing syntax. Automatically resolves tag addresses and maps to Modbus function codes.
     /// </remarks>
-    /// <param name="node">节点对象</param>
-    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1"</param>
-    /// <param name="value">要写入的数据值，支持 Boolean/UInt16/UInt32/Single 等 .NET 类型</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>写入结果</returns>
+    /// <param name="node">节点对象 / Node object</param>
+    /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1" / Schneider tag address</param>
+    /// <param name="value">要写入的数据值 / Value to write, supports Boolean/UInt16/UInt32/Single</param>
+    /// <param name="cancellationToken">取消令牌 / Cancellation token</param>
+    /// <returns>写入结果 / Write result</returns>
     public async Task<Object> WriteTag(INode node, String tag, Object value, CancellationToken cancellationToken = default)
     {
         var addr = SchneiderAddress.Parse(tag);
@@ -296,10 +301,10 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         return await WriteAsync(node, new[] { request }, cancellationToken);
     }
 
-    /// <summary>根据施耐德地址创建点位对象</summary>
-    /// <param name="tag">原始标签</param>
-    /// <param name="addr">解析后的施耐德地址</param>
-    /// <returns>点位对象</returns>
+    /// <summary>根据施耐德地址创建点位对象 / Create point object from Schneider address</summary>
+    /// <param name="tag">原始标签 / Raw tag</param>
+    /// <param name="addr">解析后的施耐德地址 / Parsed Schneider address</param>
+    /// <returns>点位对象 / Point object</returns>
     private static IPoint CreatePoint(String tag, SchneiderAddress addr)
     {
         var modbusAddr = addr.GetModbusAddress();
@@ -326,9 +331,9 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         };
     }
 
-    /// <summary>从施耐德标签地址中提取前缀（如 MW、MD、MF、M 等）</summary>
-    /// <param name="tag">原始标签字符串，如 "MW100"、"MF100" 或 "%M0.1"</param>
-    /// <returns>大写前缀，如 "MW"、"MF"、"M"</returns>
+    /// <summary>从施耐德标签地址中提取前缀（如 MW、MD、MF、M 等） / Extract prefix from Schneider tag address</summary>
+    /// <param name="tag">原始标签字符串 / Raw tag string, e.g. "MW100", "MF100" or "%M0.1"</param>
+    /// <returns>大写前缀，如 "MW"、"MF"、"M" / Uppercase prefix, e.g. "MW", "MF", "M"</returns>
     /// <example>
     /// <code>
     /// var prefix = SchneiderDriver.GetTagPrefix("MF100"); // "MF"
@@ -351,7 +356,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     #endregion
 
     #region 类型转换
-    /// <summary>将 Modbus 读取的原始字节（大端序）转换为对应 .NET 类型</summary>
+    /// <summary>将 Modbus 读取的原始字节（大端序）转换为对应 .NET 类型 / Convert Modbus raw bytes (big-endian) to .NET type</summary>
     /// <remarks>
     /// 根据标签地址类型自动判断目标 .NET 类型：
     /// <list type="bullet">
@@ -360,11 +365,12 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     ///   <item><term>%MF</term><description>→ Single（浮点数）</description></item>
     ///   <item><term>%M、%I、%Q（位地址）</term><description>→ Boolean</description></item>
     /// </list>
+    /// Automatically determines target .NET type based on tag address type.
     /// </remarks>
-    /// <param name="value">Modbus 读取的原始值（Byte[] 或 Int32）</param>
-    /// <param name="tag">原始标签字符串，用于确定数据类型</param>
-    /// <param name="addr">解析后的施耐德地址</param>
-    /// <returns>转换后的 .NET 类型值</returns>
+    /// <param name="value">Modbus 读取的原始值（Byte[] 或 Int32） / Raw Modbus value (Byte[] or Int32)</param>
+    /// <param name="tag">原始标签字符串，用于确定数据类型 / Raw tag string for type determination</param>
+    /// <param name="addr">解析后的施耐德地址 / Parsed Schneider address</param>
+    /// <returns>转换后的 .NET 类型值 / Converted .NET type value</returns>
     /// <example>
     /// <code>
     /// var addr = SchneiderAddress.Parse("MF100");
