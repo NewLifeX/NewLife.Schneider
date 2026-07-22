@@ -12,6 +12,8 @@
 
 - **开箱即用** — 基于 NewLife.Modbus 的 Modbus TCP 实现，NuGet 安装即用
 - **驱动自动发现** — 通过 `[Driver("SchneiderPLC")]` 特性标注，IoT 平台可自动扫描加载
+- **标签式读写** — 使用施耐德原生寻址语法（`"MW100"`、`"M0.1"`、`"MF100"`）直接读写，无需关注 Modbus 协议细节
+- **自动类型转换** — 读取时自动将 Modbus 大端序字节转换为对应 .NET 类型（UInt16/UInt32/Single/Boolean）
 - **统一接口** — 遵循 NewLife.IoT 标准抽象，与 IoT 生态无缝集成
 - **多框架支持** — 支持 netstandard2.1/2.0/net461/net45，兼容 .NET Framework 老旧系统与 .NET 现代应用
 
@@ -43,11 +45,17 @@ var pm = new SchneiderParameter
 // 打开连接
 var node = await driver.OpenAsync(null, pm);
 
-// 读取保持寄存器 100 (UInt16)
+// 读取保持寄存器 100 (返回 UInt16)
 var value = await driver.ReadTag(node, "MW100");
 
-// 写入保持寄存器 100
-await driver.WriteTag(node, "MW100", 12345);
+// 强类型读取：自动转换为目标类型
+var temp = await driver.ReadTagValue<Single>(node, "MF100");  // %MF → Single
+var flag = await driver.ReadTagValue<Boolean>(node, "M0.1");   // %M → Boolean
+
+// 写入保持寄存器 100（支持 .NET 原生类型）
+await driver.WriteTag(node, "MW100", (UInt16)12345);
+await driver.WriteTag(node, "MD200", (UInt32)100000);
+await driver.WriteTag(node, "MF100", 3.14159f);
 
 // 批量读取
 var dic = await driver.ReadTags(node, ["MW100", "MD200", "M0.1"]);
