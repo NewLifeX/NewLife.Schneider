@@ -25,12 +25,12 @@ dotnet add package NewLife.Schneider
 
 ### 使用
 
+#### 基础 Modbus TCP 读写
+
 ```csharp
 using NewLife.Schneider.Drivers;
 using NewLife.IoT.Drivers;
-using NewLife.IoT.Protocols;
 
-// 创建驱动
 var driver = new SchneiderDriver();
 
 // 配置参数
@@ -38,29 +38,54 @@ var pm = new SchneiderParameter
 {
     Host = 1,
     Server = "192.168.1.100:502",
-    ReadCode = FunctionCodes.ReadCoil,
-    WriteCode = FunctionCodes.WriteCoil
 };
 
 // 打开连接
-var node = driver.Open(null, pm);
+var node = await driver.OpenAsync(null, pm);
 
-// 读取数据
-var point = new Point
-{
-    Name = "test",
-    Address = "100",
-    Type = "UInt16",
-    Length = 2
-};
-var dic = driver.Read(node, new[] { point });
+// 读取保持寄存器 100 (UInt16)
+var value = await driver.ReadTag(node, "MW100");
 
-// 写入数据
-var data = BitConverter.GetBytes(12345);
-driver.Write(node, point, data);
+// 写入保持寄存器 100
+await driver.WriteTag(node, "MW100", 12345);
+
+// 批量读取
+var dic = await driver.ReadTags(node, ["MW100", "MD200", "M0.1"]);
 
 // 关闭连接
-driver.Close(node);
+await driver.CloseAsync(node);
+```
+
+#### 施耐德专用寻址语法
+
+```csharp
+// 地址解析器（无需连接PLC即可使用）
+var addr = SchneiderAddress.Parse("MW100");
+Console.WriteLine(addr.GetReadCode());  // 3 → FC03 读保持寄存器
+Console.WriteLine(addr.GetModbusAddress()); // 100
+
+var coil = SchneiderAddress.Parse("M0.1");
+Console.WriteLine(coil.GetModbusAddress()); // 1 = 0*8 + 1
+Console.WriteLine(coil.GetReadCode());  // 1 → FC01 读线圈
+
+var di = SchneiderAddress.Parse("I2.3");
+Console.WriteLine(di.GetWriteCode());   // 0 → 只读
+
+// 安全解析
+if (SchneiderAddress.TryParse("QW50", out var qw))
+    Console.WriteLine($"{qw.Type}:{qw.Offset}"); // HoldingRegister:50
+```
+
+#### 型号预设一键配置
+
+```csharp
+// 按型号创建预设参数
+var pm = driver.CreateParameter(SchneiderModel.M221);
+pm.Server = "192.168.1.100:502";
+
+// 或手动查型号信息
+var info = SchneiderModelHelper.GetModelInfo("M262");
+Console.WriteLine($"{info.Name}: {info.MaxRegisters} 寄存器");
 ```
 
 ## 📚 文档

@@ -31,6 +31,36 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     }
     #endregion
 
+    #region 型号预设
+    /// <summary>根据施耐德PLC型号创建预设参数</summary>
+    /// <remarks>
+    /// 根据型号自动填充默认端口、功能码和寄存器限制。支持 M200/M221/M241/M251/M258/M262。
+    /// </remarks>
+    /// <param name="model">施耐德PLC型号</param>
+    /// <param name="host">站号，默认1</param>
+    /// <param name="server">服务端地址，默认 "127.0.0.1:502"</param>
+    /// <returns>预设参数的 SchneiderParameter</returns>
+    /// <example>
+    /// <code>
+    /// var driver = new SchneiderDriver();
+    /// var pm = driver.CreateParameter(SchneiderModel.M221);
+    /// pm.Server = "192.168.1.100:502";
+    /// var node = driver.Open(null, pm);
+    /// </code>
+    /// </example>
+    public SchneiderParameter CreateParameter(SchneiderModel model, Byte host = 1, String server = "127.0.0.1:502")
+    {
+        var info = SchneiderModelHelper.GetModelInfo(model);
+        return new SchneiderParameter
+        {
+            Host = host,
+            Server = server,
+            ReadCode = (NewLife.IoT.Protocols.FunctionCodes)info.ReadCode,
+            WriteCode = (NewLife.IoT.Protocols.FunctionCodes)info.WriteCode,
+        };
+    }
+    #endregion
+
     #region 标签式读写
     /// <summary>读取单个施耐德标签</summary>
     /// <remarks>
@@ -41,6 +71,14 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     /// <param name="tag">施耐德标签地址，如 "MW100"、"M0.1"</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>读取到的数据值</returns>
+    /// <example>
+    /// <code>
+    /// var driver = new SchneiderDriver();
+    /// var node = driver.Open(null, parameter);
+    /// var value = await driver.ReadTag(node, "MW100");
+    /// Console.WriteLine(value);
+    /// </code>
+    /// </example>
     public async Task<Object> ReadTag(INode node, String tag, CancellationToken cancellationToken = default)
     {
         var addr = SchneiderAddress.Parse(tag);

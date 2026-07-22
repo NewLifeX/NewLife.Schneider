@@ -76,6 +76,21 @@ public class SchneiderModelInfo
 }
 
 /// <summary>施耐德PLC型号预设帮助类</summary>
+/// <example>
+/// <code>
+/// // 获取 M200 型号预设
+/// var info = SchneiderModelHelper.GetModelInfo(SchneiderModel.M200);
+/// Console.WriteLine(info.Port); // 502
+///
+/// // 按名称获取
+/// var m262 = SchneiderModelHelper.GetModelInfo("M262");
+/// Console.WriteLine(m262.MaxRegisters); // 4096
+///
+/// // 列出所有型号
+/// foreach (var m in SchneiderModelHelper.GetAllModels())
+///     Console.WriteLine($"{m.Name}: {m.MaxRegisters} 寄存器");
+/// </code>
+/// </example>
 public static class SchneiderModelHelper
 {
     /// <summary>获取型号预设信息</summary>

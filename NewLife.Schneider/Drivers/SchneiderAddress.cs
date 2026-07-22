@@ -34,6 +34,23 @@ public enum SchneiderAddressType
 ///   %QWn    — 输出寄存器字(16位)，n为偏移
 ///   %SWn    — 系统字(只读)，n为偏移
 /// </remarks>
+/// <example>
+/// <code>
+/// // 解析保持寄存器地址
+/// var addr = SchneiderAddress.Parse("MW100");
+/// Console.WriteLine(addr.Type);           // HoldingRegister
+/// Console.WriteLine(addr.Offset);         // 100
+/// Console.WriteLine(addr.GetReadCode());  // 3 (FC03)
+///
+/// // 解析线圈位地址
+/// var coil = SchneiderAddress.Parse("M0.1");
+/// Console.WriteLine(coil.GetModbusAddress()); // 1 = 0*8 + 1
+///
+/// // 尝试解析（安全版本）
+/// if (SchneiderAddress.TryParse("IW50", out var iw))
+///     Console.WriteLine(iw.GetReadCode()); // 4 (FC04)
+/// </code>
+/// </example>
 [DisplayName("施耐德地址")]
 public class SchneiderAddress
 {
@@ -73,7 +90,14 @@ public class SchneiderAddress
     /// <summary>解析施耐德地址标签</summary>
     /// <param name="tag">施耐德地址标签，如 "MW100"、"M0.1"、"I0.0"、"QW50"</param>
     /// <returns>解析后的SchneiderAddress对象</returns>
+    /// <exception cref="ArgumentNullException">tag为null时抛出</exception>
     /// <exception cref="FormatException">地址格式不正确时抛出</exception>
+    /// <example>
+    /// <code>
+    /// var addr = SchneiderAddress.Parse("%MW100");
+    /// // addr.Type = HoldingRegister, addr.Offset = 100
+    /// </code>
+    /// </example>
     public static SchneiderAddress Parse(String tag)
     {
         if (String.IsNullOrEmpty(tag)) throw new ArgumentNullException(nameof(tag));
