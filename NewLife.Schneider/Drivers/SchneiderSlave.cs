@@ -214,17 +214,4 @@ public class SchneiderSlave : ModbusSlave
             Registers.Add(new RegisterUnit { Address = address, Value = value });
     }
     #endregion
-
-    #region 日志
-    /// <summary>日志</summary>
-    public new ILog Log { get; set; }
-
-    /// <summary>写日志</summary>
-    /// <param name="format">格式化字符串</param>
-    /// <param name="args">参数</param>
-    public new void WriteLog(String format, params Object[] args)
-    {
-        Log?.Info(format, args);
-    }
-    #endregion
 }

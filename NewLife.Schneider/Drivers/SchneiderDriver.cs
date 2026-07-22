@@ -77,6 +77,7 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
         {
             if (_currentNode == null || Modbus == null) return;
 
+            // 通过简单读取测试连接可用性
             var oldConnected = _connected;
             var newConnected = false;
 
