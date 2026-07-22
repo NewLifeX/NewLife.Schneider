@@ -241,6 +241,13 @@ public class SchneiderDriver : ModbusTcpDriver, ILogFeature, ITracerFeature
     }
 
     /// <summary>批量读取多个施耐德标签</summary>
+    /// <remarks>
+    /// 内部将每个标签解析为独立 IPoint 后合并一次 Modbus 请求发送，
+    /// 减少网络往返次数。适用于需要同时读取多个不连续地址的场景。
+    /// 
+    /// 若地址相邻，Modbus 协议会合并为连续读取以提高效率；
+    /// 若地址分散，内部会拆分为多次请求（由基类 ModbusDriver 的聚合逻辑决定）。
+    /// </remarks>
     /// <param name="node">节点对象</param>
     /// <param name="tags">施耐德标签地址数组，如 ["MW100", "M0.1", "MD200"]</param>
     /// <param name="cancellationToken">取消令牌</param>

@@ -3,9 +3,7 @@ using NewLife.IoT.Drivers;
 
 namespace NewLife.Schneider.Drivers;
 
-/// <summary>
-/// 节点
-/// </summary>
+/// <summary>施耐德PLC连接节点。封装单次设备连接状态，实现 INode 接口</summary>
 public class SchneiderNode : INode
 {
     /// <summary>主机地址</summary>

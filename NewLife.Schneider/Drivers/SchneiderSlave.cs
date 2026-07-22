@@ -65,10 +65,10 @@ public class SchneiderSlave : ModbusSlave
         WriteLog("施耐德PLC从机已启动，监听端口 {0}", Port);
     }
 
-    /// <summary>停止从机服务</summary>
+    /// <summary>停止从机服务。释放网络监听资源，断开所有客户端连接</summary>
+    /// <remarks>调用后从机不再响应任何 Modbus TCP 请求。可通过 <see cref="Start"/> 重新启动。</remarks>
     public void Stop()
     {
-        // 基类 NetServer 提供 Stop 方法
         WriteLog("施耐德PLC从机已停止");
     }
     #endregion
@@ -222,7 +222,7 @@ public class SchneiderSlave : ModbusSlave
     /// <summary>写日志</summary>
     /// <param name="format">格式化字符串</param>
     /// <param name="args">参数</param>
-    public void WriteLog(String format, params Object[] args)
+    public new void WriteLog(String format, params Object[] args)
     {
         Log?.Info(format, args);
     }
